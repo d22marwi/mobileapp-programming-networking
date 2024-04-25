@@ -1,7 +1,5 @@
 package com.example.networking;
 
-import androidx.annotation.NonNull;
-
 public class Mountain {
     private String name;
 
@@ -17,7 +15,7 @@ public class Mountain {
        this.name = name;
     }
 
-    @NonNull
+
     @Override
     public String toString(){
         return name;
