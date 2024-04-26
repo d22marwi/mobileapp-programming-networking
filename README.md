@@ -1,42 +1,78 @@
 
 # Rapport
 
-**Skriv din rapport här!**
-
-_Du kan ta bort all text som finns sedan tidigare_.
-
-## Följande grundsyn gäller dugga-svar:
-
-- Ett kortfattat svar är att föredra. Svar som är längre än en sida text (skärmdumpar och programkod exkluderat) är onödigt långt.
-- Svaret skall ha minst en snutt programkod.
-- Svaret skall inkludera en kort övergripande förklarande text som redogör för vad respektive snutt programkod gör eller som svarar på annan teorifråga.
-- Svaret skall ha minst en skärmdump. Skärmdumpar skall illustrera exekvering av relevant programkod. Eventuell text i skärmdumpar måste vara läsbar.
-- I de fall detta efterfrågas, dela upp delar av ditt svar i för- och nackdelar. Dina för- respektive nackdelar skall vara i form av punktlistor med kortare stycken (3-4 meningar).
-
-Programkod ska se ut som exemplet nedan. Koden måste vara korrekt indenterad då den blir lättare att läsa vilket gör det lättare att hitta syntaktiska fel.
+Jag började med att ge appen internet som vi gjort i tidigare inlämningar, sen implementerade jag en RecyclerView i dependencies som ligger i build.gradle. Detta för att kunna använda sig av Recycler View.
+Därefter gjorde jag en klass Mountain som enbart hämtar namnen på bergen i i uppgiften. ToSring() metoden ratunerar en läsbar representation av ett objekt.
 
 ```
-function errorCallback(error) {
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            // Geolocation API stöds inte, gör något
-            break;
-        case error.POSITION_UNAVAILABLE:
-            // Misslyckat positionsanrop, gör något
-            break;
-        case error.UNKNOWN_ERROR:
-            // Okänt fel, gör något
-            break;
-    }
-}
+package com.example.networking; 
+ 
+public class Mountain { 
+    private String name; 
+ 
+    public Mountain(String name){ 
+ 
+        this.name = name; 
+    } 
+ 
+    public String getName(){ 
+ 
+        return name; 
+    } 
+ 
+    public void setName (String name){ 
+ 
+        this.name = name; 
+    } 
+ 
+ 
+    @Override 
+    public String toString(){ 
+ 
+        return name; 
+    } 
+} 
+```
+I MainActivity implementeras URL:en för att hämta datan vi vill visa i appen. I onCreate() talar vi om att URL:en ska hanteras av Json, vi använder sedan Gson för att översätta det till java-kod.
+
+```
+@Override 
+public void onPostExecute(String json) { 
+    Log.d("MainActivity", json); 
+ 
+    Gson gson = new Gson();
+    Type type = new TypeToken<List<Mountain>>() {}.getType(); 
+    List<Mountain> ListOfMountains = gson.fromJson(json, type); 
+
+ 
+```
+Jag implementerade sedan en RecyclerView i activity_main som ska visa datan, till detta behövde jag en linearlayout med en vanlig TextView i.
+Efter detta lade jag till klassen RecyclerViewAdapter som innehåller onClickListener m.m. I MainActivity onPostExecute() kopplas sedan RecyclerViewAdapter samman med RecyclerView för att kunna hämta datan i en View.
+
+```
+RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, items, new RecyclerViewAdapter.OnClickListener() { 
+            @Override 
+            public void onClick(Mountain item) { 
+                Toast.makeText(MainActivity.this, item.getName(), Toast.LENGTH_LONG).show(); 
+            } 
+        }); 
+ 
+        RecyclerView recycler_view = findViewById(R.id.recycler_view); 
+        recycler_view.setLayoutManager(new LinearLayoutManager(this)); 
+        recycler_view.setAdapter(adapter); 
+    } 
+} 
+```
+Sedan skapar jag en ArrayList som innehåller värdena ifrån Mountain finns. Den datan som finns i ListOfMoutains kommer listas i RecyclerView, getName() metoden hämtar namnen på bergen.
+
+```
+ArrayList<Mountain> items = new ArrayList<>(); 
+ 
+for (Mountain berg : ListOfMountains) { 
+    Log.d("Mountain", berg.toString()); 
+    items.add(new Mountain(berg.getName())); 
+} 
 ```
 
-Bilder läggs i samma mapp som markdown-filen.
 
-![](android.png)
-
-Läs gärna:
-
-- Boulos, M.N.K., Warren, J., Gong, J. & Yue, P. (2010) Web GIS in practice VIII: HTML5 and the canvas element for interactive online mapping. International journal of health geographics 9, 14. Shin, Y. &
-- Wunsche, B.C. (2013) A smartphone-based golf simulation exercise game for supporting arthritis patients. 2013 28th International Conference of Image and Vision Computing New Zealand (IVCNZ), IEEE, pp. 459–464.
-- Wohlin, C., Runeson, P., Höst, M., Ohlsson, M.C., Regnell, B., Wesslén, A. (2012) Experimentation in Software Engineering, Berlin, Heidelberg: Springer Berlin Heidelberg.
+![](networking1.png)
